@@ -1,0 +1,2 @@
+defmodule OpenSettlersII do
+end
