@@ -1,8 +1,12 @@
 defmodule ZmqEx do
     use Bitwise
 
-    def encode(%{flags: flags, size: size, body: body}) do
-        <<encode_flags(flags), size, body>>
+    def encode(%{flags: flags = %{type: _, long: :short, more: _}, size: size, body: <<body>>}) do
+        <<encode_flags(flags), size :: size(8), body>>
+    end
+
+    def encode(%{flags: flags = %{type: _, long: :long, more: _}, size: size, body: <<body>>}) do
+        <<encode_flags(flags), size :: size(64), body>>
     end
 
     def decode(<<flags :: size(8), rest :: binary>>) do

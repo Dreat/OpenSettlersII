@@ -24,12 +24,22 @@ defmodule ZmqExTest do
   end
 
   test "encode basic message frame" do
-    result = ZmqEx.encode(%{flags: %{type: :message, long: :short, more: false}, size: 1, body: 1})
+    result = ZmqEx.encode(%{flags: %{type: :message, long: :short, more: false}, size: 1, body: <<1>>})
     assert result == (<<0, 1, 1>>)
   end
 
   test "encode basic command frame" do
-    result = ZmqEx.encode(%{flags: %{type: :command, long: :short, more: false}, size: 1, body: 3})
+    result = ZmqEx.encode(%{flags: %{type: :command, long: :short, more: false}, size: 1, body: <<3>>})
+    assert result == (<<4, 1, 3>>)
+  end
+
+  test "encode long message frame" do
+    result = ZmqEx.encode(%{flags: %{type: :message, long: :short, more: false}, size: 1, body: <<1>>})
+    assert result == (<<0, 1, 1>>)
+  end
+
+  test "encode long command frame" do
+    result = ZmqEx.encode(%{flags: %{type: :command, long: :short, more: false}, size: 1, body: <<3>>})
     assert result == (<<4, 1, 3>>)
   end
 end
