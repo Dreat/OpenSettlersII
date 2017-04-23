@@ -42,4 +42,14 @@ defmodule ZmqExTest do
     result = ZmqEx.encode(%{flags: %{type: :command, long: :short, more: false}, size: 1, body: <<3>>})
     assert result == (<<4, 1, 3>>)
   end
+
+  test "encode short command" do
+    result = ZmqEx.encode_command(%{name: "command1", size: 0, data: << 0 >>})
+    assert result == %{flags: %{type: :command, long: :short, more: false}, size: 8, body: <<"command1">>}
+  end
+
+  test "encode long command" do
+    result = ZmqEx.encode_command(%{name: "command2", size: 56, data: "A command body"})
+    assert result == %{flags: %{type: :command, long: :long, more: false}, size: 64, body: <<"command2A command body">>}
+  end
 end
