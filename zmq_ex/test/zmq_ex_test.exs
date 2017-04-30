@@ -1,6 +1,5 @@
 defmodule ZmqExTest do
   use ExUnit.Case
-  import ZmqEx
   doctest ZmqEx
 
   test "decode basic message frame" do
@@ -51,5 +50,15 @@ defmodule ZmqExTest do
   test "encode long command" do
     result = ZmqEx.encode_command(%{name: "command2", size: 56, data: "A command body"})
     assert result == %{flags: %{type: :command, long: :long, more: false}, size: 64, body: <<"command2A command body">>}
+  end
+
+  test "decode short command" do
+    result = ZmqEx.decode_command(%{flags: %{type: :command, long: :short, more: false}, size: 8, body: "command1"})
+    assert result == %{name: "command1", size: 0, data: ""}
+  end
+
+  test "decode long command" do
+    result = ZmqEx.decode_command(%{flags: %{type: :command, long: :long, more: false}, size: 64, body: "command2A command body"})
+    assert result == %{name: "command2", size: 56, data: "A command body"}
   end
 end

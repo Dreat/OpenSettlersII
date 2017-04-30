@@ -13,12 +13,22 @@ defmodule ZmqEx do
         |> decode(rest)
     end
 
-    def encode_command(%{name: name, size: size, data: <<data :: binary>>}) do
-        case size do
-             0 -> %{flags: %{type: :command, long: :short, more: false}, size: 8, body:  name }
-             56 -> %{flags: %{type: :command, long: :long, more: false}, size: 64, body: name <> data}  
-             _ -> {:error}
-        end
+    def encode_command(%{name: name, size: 0, data: <<_data :: binary>>}) do
+        %{flags: %{type: :command, long: :short, more: false}, size: 8, body: name }
+    end
+
+    def encode_command(%{name: name, size: 56, data: <<data :: binary>>}) do
+        %{flags: %{type: :command, long: :long, more: false}, size: 64, body: name <> data}  
+    end
+
+    def decode_command(%{flags: %{type: :command, long: :short, more: false}, size: _size, body: body}) do
+        <<name::binary-size(8), command_body :: binary>> = body
+        %{name: name, size: 0, data: command_body}
+    end
+
+    def decode_command(%{flags: %{type: :command, long: _, more: false}, size: _size, body: body}) do
+        <<name::binary-size(8), command_body :: binary>> = body
+        %{name: name, size: 56, data: command_body}
     end
 
     defp decode(flags = %{type: _, long: :short, more: _}, <<size :: size(8), body :: binary>>) do
