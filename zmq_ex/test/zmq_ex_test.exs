@@ -61,4 +61,30 @@ defmodule ZmqExTest do
     result = ZmqEx.decode_command(%{flags: %{type: :command, long: :long, more: false}, size: 64, body: "command2A command body"})
     assert result == %{name: "command2", size: 56, data: "A command body"}
   end
+
+  test "test acting as a server" do
+    result = ZmqEx.as_server(<<1>>)
+    assert result == {:ok, true}
+  end
+
+  test "test acting not as a server" do
+    result = ZmqEx.as_server(<<0>>)
+    assert result == {:ok, false}
+  end
+
+  test "test wrong as a server value" do
+    result = ZmqEx.as_server(<<2>>)
+    assert result == {:error, :wrong_as_server}
+  end
+
+  test "decode version" do
+    result = ZmqEx.version(<<3,0>>)
+    assert result == {:ok, %{major: 3, minor: 0}}
+  end
+
+  test "encode version" do
+    result = ZmqEx.version(%{major: 3, minor: 1})
+    assert result == {:ok, <<3, 1>>}
+  end
+
 end

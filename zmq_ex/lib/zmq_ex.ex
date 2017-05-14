@@ -1,5 +1,29 @@
 defmodule ZmqEx do
 
+    def version(%{major: major, minor: minor}) do
+        {:ok, <<major, minor>>}
+    end
+
+    def version(<<major, minor>>) do
+        {:ok, %{major: major, minor: minor}}
+    end
+
+    def as_server(<<as_server>>) do
+        as_server_convert(as_server)
+    end
+
+    defp as_server_convert(1) do
+        {:ok, true}
+    end
+
+    defp as_server_convert(0) do
+        {:ok, false}
+    end
+
+    defp as_server_convert(_) do
+        {:error, :wrong_as_server}
+    end
+
     def encode(%{flags: flags = %{type: _, long: :short, more: _}, size: size, body: <<body>>}) do
         <<encode_flags(flags), size :: size(8), body>>
     end
